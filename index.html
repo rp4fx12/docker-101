@@ -67,49 +67,6 @@
 				</section>
 				<section>
 					<section>
-						<h2>Building with Images</h2>
-					</section>
-					<section>
-						<ul>
-							<li>Immutable file that is a snapshot of a container</li>
-							<li>Built on top of other images</li>
-							<li>Define how you want a container to look</li>
-							<li>Written in Dockerfiles</li>
-						</ul>
-					</section>
-					<section>
-						<h2>A really simple Dockerfile</h2>
-						<p>
-							<pre>
-								<code class="hljs" data-trim contenteditable>
-									# Building off a java 8 image which has java8 
-									# pre-baked in
-									FROM java8:latest
-
-									# Creating a working directory in the container
-									WORKDIR /prod/app
-
-									# Copying all the files from the current directory
-									# the user is in to the working directory of the 
-									# container (NOT A BEST PRACTICE)
-									COPY . .
-
-									# Running our application
-									CMD java -jar mytest.jar
-								</code>
-							</pre>
-						</p>
-					</section>
-					<section>
-						<h3>Run vs Build Time</h3>
-						<ul>
-							<li>Some commands work on build time i.e. ARG</li>
-							<li>Some commands work on run time i.e. ENV</li>
-						</ul>
-					</section>
-				</section>
-				<section>
-					<section>
 						<h2>Basic Commands</h2>
 						<p>You can follow along on your local if you have docker installed or go to this website - <a href="https://labs.play-with-docker.com">Docker Playground</a></p>
 						<p style="font-size:15px"><i>*Note you will have to create a docker id first, if you haven't already</i></p>
@@ -138,7 +95,7 @@
 						</p>
 					</section>
 					<section>
-						<p>Let's check all the containers and images on our machine</p>
+						<p>Let's check all the containers on our machine</p>
 						<p>
 							<pre>
 								<code class="hljs" data-trim contenteditable>
@@ -187,7 +144,7 @@
 						<p>
 							<pre>
 								<code class="hljs" data-trim contenteditable>
-									$ docker rm ${CONTAINER_NAME_1} ${CONTAINER_NAME_2}
+									$ docker container rm ${CONTAINER_NAME_1} ${CONTAINER_NAME_2}
 								</code>
 							</pre>
 						</p>
@@ -208,7 +165,7 @@
 								</code>
 							</pre>
 						</p>
-						<p class="fragment">Now if we run a "docker ps -a" we can see that there is a running container and it's up</p>
+						<p class="fragment">Now if we run a "docker container ps -a" we can see that there is a running container and it's up</p>
 						<p class="fragment" style="font-size:15px"><i>*Note: the -d stands for detached mode and the typical console output will be hidden</i></p>
 					</section>
 					<section>
@@ -216,7 +173,7 @@
 						<p>
 							<pre>
 								<code class="hljs" data-trim contenteditable>
-									$ docker kill many-moon
+									$ docker container kill many-moon
 								</code>
 							</pre>
 						</p>
@@ -232,11 +189,245 @@
 						<p>
 							<pre>
 								<code class="hljs" data-trim contenteditable>
-									docker run -d --name 
+									$ docker container run -d --name go golang:1.9.7 sleep 50m
+								</code>
+							</pre>
+						</p>
+						<p class="fragment" style="font-size:15px"><i>*Note: this is very much a hack to keep the container up and running</i></p>
+					</section>
+					<section>
+						<p>Next, we'll hop inside the container</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									 $ docker container exec -it go /bin/bash
+								</code>
+							</pre>
+						</p>
+						<p class="fragment">So we're inside the container now</p>
+					</section>
+					<section>
+						<p>But what if we want to run some go code</p>
+						<p class="fragment"> And it also looks like we have no editors</p>
+					</section>
+					<section>
+							<p>Let's get a coding environment setup</p>
+							<p>
+								<pre>
+									<code class="hljs" data-trim contenteditable>
+										$ apt-get update
+										$ apt-get install vim
+										$ mkdir -p /prod/app; cd /prod/app
+									</code>
+								</pre>
+							</p>
+					</section>
+					<section>
+						Then we can create our app 
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ vim main.go
+								</code>
+							</pre>
+						</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									package main
+
+									import "fmt"
+
+									func main() {
+										fmt.Println("hello world")
+									}
 								</code>
 							</pre>
 						</p>
 					</section>
+					<section>
+						Now we can run our app 
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ go run main.go
+								</code>
+							</pre>
+						</p>						
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Building with Images</h2>
+					</section>
+					<section>
+						<ul>
+							<li>Immutable file that is a snapshot of a container</li>
+							<li>Built on top of other images</li>
+							<li>Define how you want a container to look</li>
+							<li>Written in Dockerfiles</li>
+						</ul>
+					</section>
+					<section>
+						<h2>A really simple Dockerfile</h2>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									# Building off a java 8 image which has java8 
+									# pre-baked in
+									FROM java8:latest
+
+									# Creating a working directory in the container
+									WORKDIR /prod/app
+
+									# Copying all the files from the current directory
+									# the user is in to the working directory of the 
+									# container (NOT A BEST PRACTICE)
+									COPY . .
+
+									# Running our application
+									CMD java -jar mytest.jar
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<h2>A little more complicated Dockerfile</h2>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									# Building off of Debian Jessie
+									FROM debian:jessie
+									
+									# Update Packages
+									RUN apt-get -qq update \
+										&& DEBIAN_FRONTEND=noninteractive apt-get -qq install -y --no-install-recommends python-pygments git ca-certificates asciidoc \
+										&& rm -rf /var/lib/apt/lists/*
+									
+									# Set Hugo Envs
+									ENV HUGO_VERSION 0.29
+									ENV HUGO_BINARY hugo_${HUGO_VERSION}_Linux-64bit.deb
+									
+									#Get Hugo Binaries
+									ADD https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/${HUGO_BINARY} /tmp/hugo.deb
+									RUN dpkg -i /tmp/hugo.deb \
+										&& rm /tmp/hugo.deb
+									
+									
+									# Expose default hugo port
+									EXPOSE ${HUGO_PORT}
+									
+									# Automatically build site
+									RUN mkdir /app
+									ADD site/ /app
+									WORKDIR /app
+									CMD hugo server -b ${HUGO_BASE_URL} -p ${HUGO_PORT} --bind=0.0.0.0
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<h3>Run vs Build Time</h3>
+						<ul>
+							<li>Some commands work on build time i.e. ARG, RUN ...</li>
+							<li>Some commands work on run time i.e. ENV, CMD ...</li>
+						</ul>
+					</section>
+					<section data-background="https://media.giphy.com/media/4Hk517PxIfoyppBc7r/giphy.gif">
+						Building a dockerfile for our go app
+					</section>
+					<section>
+						<h2>Let's turn our old stuff into a docker image</h2>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									# Building off our golang image
+									FROM golang:1.9.7
+									
+									WORKDIR /prod/app
+
+									# Don't really need this but showing stuff on build time
+									RUN apt-get update
+									RUN apt-get install vim -y
+
+									# Copy our go program
+									COPY main.go .
+									
+									# Run our go program
+									CMD go run main.go
+								</code>
+							</pre>
+						</p>
+						<p class="fragment" style="font-size:15px"><i>*Note: We'd also typically run "go build main.go" first and move the executable</i></p>
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker build -t go-hello .
+									$ docker container run --name hi-there go-hello
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>Pushing it up to a hub is super easy</p>
+							<p>
+								<pre>
+									<code class="hljs" data-trim contenteditable>
+										$ docker tag go-hello ${DOCKER_ID}/go-hello
+										$ docker push ${DOCKER_ID}/go-hello
+									</code>
+								</pre>
+							</p>
+							<p style="font-size:15px"><i>*Note: You'll probably need to login using "docker login" first</i></p>
+					</section>
+					<section data-background="https://media.giphy.com/media/Rl9Yqavfj2Ula/giphy.gif"></section>
+				</section>
+				<section>
+					<section>
+							<h2>Using docker on the cloud (specifically AWS)</h2>
+					</section>
+					<section>
+						There's a bunch of different tools but let's focus on ECS
+						<ul>
+							<li>Runs on a normal EC2</li>
+							<li>Provides a level of abstraction on managing containers</li>
+							<li>An ECS Agent (another container) registers the instance to an ECS cluster</li>
+							<li>The cluster has services which manage the running containers</li>
+							<li>Each service has a task defintion which defines how the container runs</li>
+							<li>Each container is referred to a task</li>
+						</ul>
+					</section>
+					<section>
+						<p>There's a bunch of other tools as well</p>
+						<p class="fragment">EKS (Elastic Kubernetes Service)</p>
+						<p class="fragment">Plain ole' Kubernetes</p>
+						<p class="fragment">Docker Swarm</p>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Other topics to look into</h2>
+					</section>
+					<section data-transition="Zoom">
+						Docker Networks
+					</section>
+					<section data-transition="Fade">
+						Docker compose
+					</section>
+					<section data-transition="Slide">
+						All the other docker commands
+					</section>
+				</section>
+				<section>
+					Some docker talks:
+					<p><a href="https://www.youtube.com/watch?v=Utf-A4rODH8">Liz Rice - Building a container from scratch</a></p>
+					<p><a href="https://www.youtube.com/watch?v=FdkNAjjO5yQ">Talk at Docker Con by Cerner</a></p>
+					<p><a href="https://www.youtube.com/watch?v=PH-2FfFD2PU">Talk on Kubernetes</a></p>
+				</section>
+				<section data-background="https://media.giphy.com/media/xT1XH0c2JNKQsOoaVG/giphy.gif">
+					Gratzi
 				</section>
 			</div>
 		</div>
