@@ -48,7 +48,9 @@
 					<section>
 						<h2>What is a container?</h2>
 					</section>
-					<section data-background="https://media.giphy.com/media/huWcRHuN4LCQE/giphy.gif"></section>
+					<section data-background="https://media.giphy.com/media/huWcRHuN4LCQE/giphy.gif">
+						<p class="fragment"> It's not really a docker talk without a shipping crate somewhere</p>
+					</section>
 					<section>
 						<ul>
 							<li>lightweight, standalone, executable package of software</li>
@@ -72,7 +74,168 @@
 							<li>Immutable file that is a snapshot of a container</li>
 							<li>Built on top of other images</li>
 							<li>Define how you want a container to look</li>
+							<li>Written in Dockerfiles</li>
 						</ul>
+					</section>
+					<section>
+						<h2>A really simple Dockerfile</h2>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									# Building off a java 8 image which has java8 
+									# pre-baked in
+									FROM java8:latest
+
+									# Creating a working directory in the container
+									WORKDIR /prod/app
+
+									# Copying all the files from the current directory
+									# the user is in to the working directory of the 
+									# container (NOT A BEST PRACTICE)
+									COPY . .
+
+									# Running our application
+									CMD java -jar mytest.jar
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<h3>Run vs Build Time</h3>
+						<ul>
+							<li>Some commands work on build time i.e. ARG</li>
+							<li>Some commands work on run time i.e. ENV</li>
+						</ul>
+					</section>
+				</section>
+				<section>
+					<section>
+						<h2>Basic Commands</h2>
+						<p>You can follow along on your local if you have docker installed or go to this website - <a href="https://labs.play-with-docker.com">Docker Playground</a></p>
+						<p style="font-size:15px"><i>*Note you will have to create a docker id first, if you haven't already</i></p>
+					</section>
+					<section>
+						<p>Let's run a simple container</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker container run busybox echo hello world
+								</code>
+							</pre>
+						</p>
+						<p style="font-size:15px"><i>*Note you can also run the above the command without "container" but it's an older format</i></p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									Unable to find image 'busybox:latest' locally
+									latest: Pulling from library/busybox
+									8c5a7da1afbc: Pull complete
+									Digest: sha256:cb63aa0641a885f54de20f61d152187419e8f6b159ed11a251a09d115fdff9bd
+									Status: Downloaded newer image for busybox:latest
+									hello world
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>Let's check all the containers and images on our machine</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker container ps -a
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>What happens when we run it again?</p>
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker container run busybox echo hello world
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									hello world
+								</code>
+							</pre>
+						</p>
+						<p class="fragment" style="font-size:15px">
+							<i>
+								*Note: if you don't specify a tag docker will default to latest
+							</i>
+						</p>
+					</section>
+					<section>
+						Let's clean up everything
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker container ps -a
+								</code>
+							</pre>
+						</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker rm ${CONTAINER_NAME_1} ${CONTAINER_NAME_2}
+								</code>
+							</pre>
+						</p>
+						<p class="fragment" style="font-size:15px">
+							<i>
+								*Note: We can also use container ids but that's not great either, the best practice is to name your running containers with --name command
+							</i>
+						</p>
+					</section>
+					<section data-background="https://media.giphy.com/media/26xBI73gWquCBBCDe/giphy.gif">
+						What if we want to stop a running container
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker container run -d --name many-moon busybox sleep 500m 
+								</code>
+							</pre>
+						</p>
+						<p class="fragment">Now if we run a "docker ps -a" we can see that there is a running container and it's up</p>
+						<p class="fragment" style="font-size:15px"><i>*Note: the -d stands for detached mode and the typical console output will be hidden</i></p>
+					</section>
+					<section>
+						<p>To stop it we run</p>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									$ docker kill many-moon
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>That's fine and all but I can run "echo hello world" on most any servers and it'll work</p>
+						<p class="fragment"> What if run something like "go version"?</p>
+					</section>
+					<section>
+						But we can use docker to get around that.
+					</section>
+					<section>
+						<p>
+							<pre>
+								<code class="hljs" data-trim contenteditable>
+									docker run -d --name 
+								</code>
+							</pre>
+						</p>
 					</section>
 				</section>
 			</div>
