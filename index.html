@@ -64,6 +64,23 @@
 						<h3> A container is not a VM</h3>
 						<p><img width="600" src="img/container-vs-vm.png" alt="container-vs-vm"</p>
 					</section>
+					<section>
+						<p>Virtual Machines</p>
+						<ul>
+							<li class="fragment">Abstraction on the hardware</li>
+							<li class="fragment">They have their own full blown os</li>
+							<li class="fragment">The hypervisor helps manage multiple os's on the host machine</li>
+							<li class="fragment">They're also pretty heavy</li>
+						</ul>
+					</section>
+					<section>
+						<p>Containers</p>
+						<ul>
+							<li class="fragment">Much lighter</li>
+							<li class="fragment">Abstraction on the app layer and on the os</li>
+							<li class="fragment">Are just a package of the bins and libs</li>
+						</ul>
+					</section>
 				</section>
 				<section>
 					<section>
@@ -167,6 +184,7 @@
 						</p>
 						<p class="fragment">Now if we run a "docker container ps -a" we can see that there is a running container and it's up</p>
 						<p class="fragment" style="font-size:15px"><i>*Note: the -d stands for detached mode and the typical console output will be hidden</i></p>
+						<p class="fragment" style="font-size:15px"><i>*Note: This is good when you don't want to block your terminal</i></p>
 					</section>
 					<section>
 						<p>To stop it we run</p>
@@ -394,42 +412,42 @@
 						<p>
 							<pre>
 								<code>
-										package main
+package main
 
-										import (
-											"fmt"
-											"net/http"
-											"os"
-											"log"
-										)
-										
-										const (
-											default_port = "8080"
-											default_name = "world"
-										)
-										
-										func main() {
-											var port string
-											var name string
-											if (len(os.Args) > 1 && os.Args[1] != "") {
-												port = ":" + os.Args[1]
-											} else {
-												port = ":" + default_port
-											}
-											if (len(os.Args) > 2 && os.Args[2] != "") {
-												name = os.Args[2]
-											} else {
-												name = default_name
-											}
-										
-											fmt.Printf("Server started on port: %v with name: %v", port, name)
-											http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
-												fmt.Fprintf(w, "Hello, %s", name)
-											})
-											
-											log.Fatal(http.ListenAndServe(port, nil)) 
-										
-										}
+import (
+	"fmt"
+	"net/http"
+	"os"
+	"log"
+)
+
+const (
+	default_port = "8080"
+	default_name = "world"
+)
+
+func main() {
+	var port string
+	var name string
+	if (len(os.Args) > 1 && os.Args[1] != "") {
+		port = ":" + os.Args[1]
+	} else {
+		port = ":" + default_port
+	}
+	if (len(os.Args) > 2 && os.Args[2] != "") {
+		name = os.Args[2]
+	} else {
+		name = default_name
+	}
+
+	fmt.Printf("Server started on port: %v with name: %v", port, name)
+	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello, %s", name)
+	})
+	
+	log.Fatal(http.ListenAndServe(port, nil)) 
+
+}
 								</code>
 							</pre>
 						</p>
@@ -439,13 +457,17 @@
 						<p>
 							<pre>
 								<code>
-									FROM golang:1.9.7
+# Basing off a golang image									
+FROM golang:1.9.7
 
-									WORKDIR /prod/app
-									
-									COPY main.go .
-									
-									RUN go build main.go
+# Create a working directory
+WORKDIR /prod/app
+
+# Copy our main directory
+COPY main.go .
+
+# Compiling to an executable
+RUN go build main.go
 								</code>
 							</pre>
 						</p>
@@ -455,11 +477,11 @@
 						<p>
 							<pre>
 								<code>
-									# Building off of my code
-									FROM rp4fx/go-simple-server:1.0
-								
-									# Running our program
-									CMD ./main ${PORT} ${NAME}
+# Building off of my code
+FROM rp4fx/go-simple-server:1.0
+
+# Running our program
+CMD ./main ${PORT} ${NAME}
 								</code>
 							</pre>
 						</p>
@@ -469,8 +491,8 @@
 						<p>
 							<pre>
 								<code>
-									$ docker build -t our-go-server .
-									$ docker run -d -p 9001:9000 --name my-server -e PORT=9000 -e NAME=${WHATEVER_YOUR_HEART_DESIRES} our-go-server 
+$ docker build -t our-go-server .
+$ docker run -d -p 9001:9000 --name my-server -e PORT=9000 -e NAME=${WHATEVER_YOUR_HEART_DESIRES} our-go-server 
 								</code>
 							</pre>
 						</p>
@@ -480,14 +502,14 @@
 						<p>
 							<pre>
 								<code>
-									$ curl http://localhost:9000
+$ curl http://localhost:9000
 								</code>
 							</pre>
 						</p>
 						<p>
 								<pre>
 									<code>
-										$ curl http://localhost:9001
+$ curl http://localhost:9001
 									</code>
 								</pre>
 							</p>
