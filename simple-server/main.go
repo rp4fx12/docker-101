@@ -2,35 +2,35 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
-	"log"
 )
 
 const (
-	default_port = "8080"
-	default_name = "world"
+	defaultPort = "8080"
+	defaultName = "world"
 )
 
 func main() {
 	var port string
 	var name string
-	if (len(os.Args) > 1 && os.Args[1] != "") {
+	if len(os.Args) > 1 && os.Args[1] != "" {
 		port = ":" + os.Args[1]
 	} else {
-		port = ":" + default_port
+		port = ":" + defaultPort
 	}
-	if (len(os.Args) > 2 && os.Args[2] != "") {
+	if len(os.Args) > 2 && os.Args[2] != "" {
 		name = os.Args[2]
 	} else {
-		name = default_name
+		name = defaultName
 	}
 
 	fmt.Printf("Server started on port: %v with name: %v", port, name)
-	http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Hello, %s", name)
 	})
-	
-	log.Fatal(http.ListenAndServe(port, nil)) 
+
+	log.Fatal(http.ListenAndServe(port, nil))
 
 }
