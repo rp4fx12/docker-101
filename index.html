@@ -353,12 +353,14 @@
 									# Copy our go program
 									COPY main.go .
 									
+									# Build our go artifact
+									RUN go build main.go
+
 									# Run our go program
-									CMD go run main.go
+									CMD ./main
 								</code>
 							</pre>
 						</p>
-						<p class="fragment" style="font-size:15px"><i>*Note: We'd also typically run "go build main.go" first and move the executable</i></p>
 					</section>
 					<section>
 						<p>
@@ -371,18 +373,124 @@
 						</p>
 					</section>
 					<section>
-						<p>Pushing it up to a hub is super easy</p>
-							<p>
+							<p>Pushing it up to a hub is super easy</p>
+								<p>
+									<pre>
+										<code class="hljs" data-trim contenteditable>
+											$ docker tag go-hello ${DOCKER_ID}/go-hello
+											$ docker push ${DOCKER_ID}/go-hello
+										</code>
+									</pre>
+								</p>
+								<p style="font-size:15px"><i>*Note: You'll probably need to login using "docker login" first</i></p>
+					</section>
+					<section data-background="https://media.giphy.com/media/Rl9Yqavfj2Ula/giphy.gif"></section>
+					<section>
+							<p>Let's build off another server to show port mappings</p>
+							<p>I created an image called rp4fx/go-simple-server:1.0</p>
+					</section>
+					<section>
+						<p>Sample Go Code</p>
+						<p>
+							<pre>
+								<code>
+										package main
+
+										import (
+											"fmt"
+											"net/http"
+											"os"
+											"log"
+										)
+										
+										const (
+											default_port = "8080"
+											default_name = "world"
+										)
+										
+										func main() {
+											var port string
+											var name string
+											if (len(os.Args) > 1 && os.Args[1] != "") {
+												port = ":" + os.Args[1]
+											} else {
+												port = ":" + default_port
+											}
+											if (len(os.Args) > 2 && os.Args[2] != "") {
+												name = os.Args[2]
+											} else {
+												name = default_name
+											}
+										
+											fmt.Printf("Server started on port: %v with name: %v", port, name)
+											http.HandleFunc("/", func (w http.ResponseWriter, r *http.Request) {
+												fmt.Fprintf(w, "Hello, %s", name)
+											})
+											
+											log.Fatal(http.ListenAndServe(port, nil)) 
+										
+										}
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>Sample Dockerfile</p>
+						<p>
+							<pre>
+								<code>
+									FROM golang:1.9.7
+
+									WORKDIR /prod/app
+									
+									COPY main.go .
+									
+									RUN go build main.go
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>So let's create a Dockerfile based on it</p>
+						<p>
+							<pre>
+								<code>
+									FROM rp4fx/go-simple-server:1.0
+								
+									CMD ./main ${PORT} ${NAME}
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>And now let's build it and run it</p>
+						<p>
+							<pre>
+								<code>
+									$ docker build -t our-go-server .
+									$ docker run -d -p 9001:9000 --name my-server -e PORT=9000 -e NAME=${WHATEVER_YOUR_HEART_DESIRES} our-go-server 
+								</code>
+							</pre>
+						</p>
+					</section>
+					<section>
+						<p>And now let's try and curl it and see what happens</p>
+						<p>
+							<pre>
+								<code>
+									$ curl http://localhost:9000
+								</code>
+							</pre>
+						</p>
+						<p>
 								<pre>
-									<code class="hljs" data-trim contenteditable>
-										$ docker tag go-hello ${DOCKER_ID}/go-hello
-										$ docker push ${DOCKER_ID}/go-hello
+									<code>
+										$ curl http://localhost:9001
 									</code>
 								</pre>
 							</p>
-							<p style="font-size:15px"><i>*Note: You'll probably need to login using "docker login" first</i></p>
 					</section>
-					<section data-background="https://media.giphy.com/media/Rl9Yqavfj2Ula/giphy.gif"></section>
+					<section data-background="https://media.giphy.com/media/111ebonMs90YLu/giphy.gif"></section>
 				</section>
 				<section>
 					<section>
