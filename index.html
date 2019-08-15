@@ -209,22 +209,11 @@
 						<p>
 							<pre>
 								<code class="hljs" data-trim contenteditable>
-									$ docker container run -d --name go golang:1.9.7 sleep 50m
+									$ docker container run -it --name go golang:1.9.7 sh
 								</code>
 							</pre>
 						</p>
-						<p class="fragment" style="font-size:15px"><i>*Note: this is very much a hack to keep the container up and running</i></p>
-					</section>
-					<section>
-						<p>Next, we'll hop inside the container</p>
-						<p>
-							<pre>
-								<code class="hljs" data-trim contenteditable>
-									 $ docker container exec -it go /bin/bash
-								</code>
-							</pre>
-						</p>
-						<p class="fragment">So we're inside the container now</p>
+						<p class="fragment" style="font-size:15px"><i>*Note: You can also use `docker container exec -it ${RUNNING_CONTAINER_ID_OR_NAME} sh` to get inside of an already running container</i></p>
 					</section>
 					<section>
 						<p>But what if we want to run some go code</p>
